@@ -23,12 +23,12 @@ void registerResolver(String languageCode, CategoryResolver resolver) {
 String plural(
   int count,
   String languageCode, {
-  String zero,
-  String one,
-  String two,
-  String few,
-  String many,
-  String other,
+  String? zero,
+  String? one,
+  String? two,
+  String? few,
+  String? many,
+  String? other,
 }) {
   return _resolvePlural(count, languageCode, QuantityType.cardinal,
       zero: zero, one: one, two: two, few: few, many: many, other: other);
@@ -40,12 +40,12 @@ String plural(
 String cardinal(
   int count,
   String languageCode, {
-  String zero,
-  String one,
-  String two,
-  String few,
-  String many,
-  String other,
+  String? zero,
+  String? one,
+  String? two,
+  String? few,
+  String? many,
+  String? other,
 }) {
   return _resolvePlural(count, languageCode, QuantityType.cardinal,
       zero: zero, one: one, two: two, few: few, many: many, other: other);
@@ -57,12 +57,12 @@ String cardinal(
 String ordinal(
   int count,
   String languageCode, {
-  String zero,
-  String one,
-  String two,
-  String few,
-  String many,
-  String other,
+  String? zero,
+  String? one,
+  String? two,
+  String? few,
+  String? many,
+  String? other,
 }) {
   return _resolvePlural(count, languageCode, QuantityType.ordinal,
       zero: zero, one: one, two: two, few: few, many: many, other: other);
@@ -78,15 +78,14 @@ String _resolvePlural(
   int count,
   String languageCode,
   QuantityType type, {
-  String zero,
-  String one,
-  String two,
-  String few,
-  String many,
-  String other,
+  String? zero,
+  String? one,
+  String? two,
+  String? few,
+  String? many,
+  String? other,
 }) {
-  final c =
-      _resolveCategory(languageCode, count, type) ?? QuantityCategory.other;
+  final c = _resolveCategory(languageCode, count, type);
 //  if (c == null) c = QuantityCategory.other;
   many ??= other;
   switch (c) {
@@ -103,7 +102,6 @@ String _resolvePlural(
     case QuantityCategory.other:
       return _firstNotNull(other, many);
   }
-  return '???';
 }
 
 QuantityCategory _defaultResolver(int count, QuantityType type) {
@@ -123,12 +121,12 @@ QuantityCategory _defaultResolver(int count, QuantityType type) {
 }
 
 QuantityCategory _resolveCategory(
-  String languageCode,
-  int count,
+  String? languageCode,
+  int? count,
   QuantityType type,
 ) {
   if (count == null) return QuantityCategory.other;
-  CategoryResolver resolver;
+  CategoryResolver? resolver;
   if (languageCode != null) {
     resolver = _resolverRegistry[languageCode];
     resolver ??= _defaultResolver;
@@ -138,7 +136,7 @@ QuantityCategory _resolveCategory(
   return resolver(count, type);
 }
 
-String _firstNotNull(String a, String b) {
+String _firstNotNull(String? a, String? b) {
   if (a != null) return a;
   if (b != null) return b;
   return '???';

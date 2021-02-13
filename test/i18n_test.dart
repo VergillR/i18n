@@ -68,7 +68,7 @@ void main() {
       root.objectName = 'Test';
       root.defaultObjectName = 'Test';
       final todoList = <TodoItem>[];
-      var yaml = 'foo:\n'
+      const yaml = 'foo:\n'
           '  subfoo: subbar\n'
           '  subfoo2: subbar2\n'
           'other: maybe\n'
@@ -76,7 +76,7 @@ void main() {
           '  status:\n'
           '    name: not\n';
 
-      prepareTodoList(todoList, loadYaml(yaml), root);
+      prepareTodoList(todoList, loadYaml(yaml) as YamlMap, root);
       todoList.sort((a, b) {
         return a.meta.objectName.compareTo(b.meta.objectName);
       });
@@ -85,7 +85,7 @@ void main() {
       expect(todoList[1].meta.objectName, equals('OrTest'));
       expect(todoList[2].meta.objectName, equals('StatusOrTest'));
       expect(todoList[2].meta.parent, equals(todoList[1].meta));
-      expect(todoList[2].meta.parent.parent, equals(todoList[3].meta));
+      expect(todoList[2].meta.parent?.parent, equals(todoList[3].meta));
       expect(todoList[3].meta.objectName, equals('Test'));
       expect(todoList[3].meta.parent, isNull);
     });
@@ -93,11 +93,11 @@ void main() {
 }
 
 void testMeta(String name,
-    {bool isDefault,
-    String defaultObjectName,
-    String objectName,
-    String languageCode,
-    String localeName}) {
+    {required bool isDefault,
+    required String defaultObjectName,
+    required String objectName,
+    required String languageCode,
+    required String localeName}) {
   final meta = generateMessageObjectName(name);
   test('$name: isDefault', () {
     expect(meta.isDefault, equals(isDefault));

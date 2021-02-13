@@ -11,15 +11,15 @@ class YamlBasedBuilder implements Builder {
   @override
   Future build(BuildStep buildStep) async {
     // Each [buildStep] has a single input.
-    var inputId = buildStep.inputId;
+    final inputId = buildStep.inputId;
 
     // Create a new target [AssetId] based on the old one.
-    var contents = await buildStep.readAsString(inputId);
+    final contents = await buildStep.readAsString(inputId);
 
-    var objectName = generateMessageObjectName(inputId.pathSegments.last);
-    var dartContent = generateDartContentFromYaml(objectName, contents);
+    final objectName = generateMessageObjectName(inputId.pathSegments.last);
+    final dartContent = generateDartContentFromYaml(objectName, contents);
 
-    var copy = inputId.changeExtension('.dart');
+    final copy = inputId.changeExtension('.dart');
 
     // Write out the new asset.
     await buildStep.writeAsString(copy, dartContent);

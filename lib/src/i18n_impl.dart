@@ -28,7 +28,7 @@ extension FirstUpper on String {
 }
 
 String generateDartContentFromYaml(ClassMeta meta, String yamlContent) {
-  final messages = loadYaml(yamlContent);
+  final YamlMap messages = loadYaml(yamlContent) as YamlMap;
 
   final todoList = <TodoItem>[];
 
@@ -38,9 +38,9 @@ String generateDartContentFromYaml(ClassMeta meta, String yamlContent) {
 
   output.writeln('// GENERATED FILE, do not edit!');
   output.writeln('import \'package:i18n/i18n.dart\' as i18n;');
-  if (meta.defaultFileName != null) {
-    output.writeln("import '${meta.defaultFileName}';");
-  }
+  // if (meta.defaultFileName != null) {
+  //   output.writeln("import '${meta.defaultFileName}';");
+  // }
   // output.writeln('');
   output.writeln('String get _languageCode => \'${meta.languageCode}\';');
   // output.writeln('String get _localeName => \'${meta.localeName}\';');
@@ -59,7 +59,7 @@ String generateDartContentFromYaml(ClassMeta meta, String yamlContent) {
       '\ti18n.cardinal(count, _languageCode, zero:zero, one:one, two:two, few:few, many:many, other:other);');
   output.writeln('');
 
-  for (var todo in todoList) {
+  for (final todo in todoList) {
     renderTodoItem(todo, output);
     output.writeln('');
   }
@@ -107,7 +107,7 @@ ClassMeta generateMessageObjectName(String fileName) {
         throw Exception(
             'Wrong country code "$countryCode" in file name "$fileName". Country code must match $twoCharsUpper');
       }
-      result.localeName = '${result.languageCode}_${countryCode}';
+      result.localeName = '${result.languageCode}_$countryCode';
     }
     result.objectName = '${result.defaultObjectName}_${result.localeName}';
     return result;
@@ -115,8 +115,8 @@ ClassMeta generateMessageObjectName(String fileName) {
 }
 
 void renderTodoItem(TodoItem todo, StringBuffer output) {
-  final meta = todo.meta;
-  final content = todo.content;
+  final ClassMeta meta = todo.meta;
+  final YamlMap content = todo.content;
   if (meta.isDefault) {
     output.writeln('class ${meta.objectName} {');
   } else {
@@ -127,7 +127,7 @@ void renderTodoItem(TodoItem todo, StringBuffer output) {
   if (meta.parent == null) {
     output.writeln('\tconst ${meta.objectName.convertName()}();');
   } else {
-    output.writeln('\tfinal ${meta.parent.objectName.convertName()} _parent;');
+    output.writeln('\tfinal ${meta.parent!.objectName.convertName()} _parent;');
     if (meta.isDefault) {
       output.writeln('\tconst ${meta.objectName}(this._parent);');
     } else {
@@ -135,18 +135,18 @@ void renderTodoItem(TodoItem todo, StringBuffer output) {
           '\tconst ${meta.objectName.convertName()}(this._parent):super(_parent);');
     }
   }
-  content.forEach((k, v) {
+  content.forEach((dynamic k, dynamic v) {
     if (v is YamlMap) {
-      final prefix = _firstCharUpper(k);
+      final prefix = _firstCharUpper(k.toString());
       final child = meta.nest(prefix);
       output.writeln(
-          '\t${child.objectName.convertName()} get ${k} => ${child.objectName.convertName()}(this);');
+          '\t${child.objectName.convertName()} get $k => ${child.objectName.convertName()}(this);');
     } else {
-      if (k.contains('(')) {
+      if (k.toString().contains('(')) {
         // function
-        output.writeln('\tString ${k} => """${v}""";');
+        output.writeln('\tString $k => """$v""";');
       } else {
-        output.writeln('\tString get ${k} => """${v}""";');
+        output.writeln('\tString get $k => """$v""";');
       }
     }
   });
@@ -158,9 +158,9 @@ void prepareTodoList(
   final todo = TodoItem(name, messages);
   todoList.add(todo);
 
-  messages.forEach((k, v) {
+  messages.forEach((dynamic k, dynamic v) {
     if (v is YamlMap) {
-      final prefix = _firstCharUpper(k);
+      final prefix = _firstCharUpper(k.toString());
       prepareTodoList(todoList, v, name.nest(prefix));
     }
   });
